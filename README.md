@@ -7,7 +7,7 @@
        
        
        
-This tool scanns for all possible (ICANN) TLDs of a given domain name.
+This tool scans for all possible (ICANN) TLDs of a given domain name.
 
 
 | Switch | Description |
