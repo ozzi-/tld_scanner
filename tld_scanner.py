@@ -1,5 +1,5 @@
 import time
-from urllib import request
+import urllib2
 import sys, getopt, socket
 
 domain = ''
@@ -21,7 +21,7 @@ def scan(tlds,domain,protocols):
                 if ip != "127.0.53.53":
                     target=(protocol+domain+tld.lower())
                     if mode != 'n':
-                        response = request.urlopen(target)
+                        response = urllib2.urlopen(target)
                     exists.append(target)
                     if outputfile is not '':
                         f.write(target+" "+ip+'\n')
@@ -39,7 +39,7 @@ def print_header():
     print ('    | |  | |    | |  | | | (___ | |       /  \  |  \| |  \| | |__  | |__) |')
     print ('    | |  | |    | |  | |  \___ \| |      / /\ \ | . ` | . ` |  __| |  _  / ')
     print ('    | |  | |____| |__| |  ____) | |____ / ____ \| |\  | |\  | |____| | \ \ ')
-    print ('    |_|  |______|_____/  |_____/ \_____/_/    \_|_| \_|_| \_|______|_|  \_\\') 
+    print ('    |_|  |______|_____/  |_____/ \_____/_/    \_|_| \_|_| \_|______|_|  \_\\')
     print ('')
 
 def main(argv):
@@ -73,7 +73,7 @@ def main(argv):
         elif opt in ("-d"):
             domain = arg
         elif opt in ("-i"):
-            tldfile = arg     
+            tldfile = arg
         elif opt in ("-b"):
             b=True
         elif opt in ("-c"):
@@ -82,9 +82,9 @@ def main(argv):
             n=True
     mode = 'b' # DEFAULT
     if b or (n and c):
-	    mode = 'b'
+            mode = 'b'
     elif n:
-	    mode = 'n'
+            mode = 'n'
     elif c:
         mode = 'c'
 
@@ -93,7 +93,10 @@ if __name__ == '__main__':
     print_header()
     try:
         print("Getting the newest TLD's from iana.org . . .")
-        request.urlretrieve ("https://data.iana.org/TLD/tlds-alpha-by-domain.txt", "tld_scanner_list.txt")
+        f = urllib2.urlopen("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
+        data = f.read()
+        with open("tld_scanner_list.txt", "wb") as code:
+            code.write(data)
     except Exception as e:
         print(e)
         print("Please check your network connectivity (or https://data.iana.org is down)!")
@@ -113,7 +116,6 @@ if __name__ == '__main__':
         if mode =='c': print("Mode: Connecting to host")
         if mode =='b': print("Mode: Name lookup + connecting to host")
         if mode =='n': print("Mode: Name lookup only")
-        print('')
         protocols = ["http://","https://"] if https else ["http://"]
         print("Using the following protocol(s): "+str(protocols))
         if domain is '':
