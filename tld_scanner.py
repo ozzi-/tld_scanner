@@ -120,7 +120,7 @@ if __name__ == '__main__':
         print("Using the following protocol(s): "+str(protocols))
         if domain is '':
             print("")
-            domain = input("Enter Domain name (example 'google'): ")
+            domain = raw_input("Enter Domain name (example 'google'): ")
         else:
             print('\nUsing domain: '+domain)
         domain = domain+"."
