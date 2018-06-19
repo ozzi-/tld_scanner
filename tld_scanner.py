@@ -1,18 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import time
+import json
 import urllib2
 import sys, getopt, socket
+from tqdm import tqdm
 
 domain = ''
 https  = False
 outputfile = ''
 tldfile = ''
-mode=''
+mode = ''
+iana = False
 
 def scan(tlds,domain,protocols):
     if outputfile is not '':
         f = open(outputfile,'w')
-    exists = []
-    for tld in tlds:
+    exists = {}
+    for tld in tqdm(tlds, unit="domains"):
         for protocol in protocols:
             try:
                 ip = ""
@@ -22,47 +27,47 @@ def scan(tlds,domain,protocols):
                     target=(protocol+domain+tld.lower())
                     if mode != 'n':
                         response = urllib2.urlopen(target)
-                    exists.append(target)
-                    if outputfile is not '':
-                        f.write(target+" "+ip+'\n')
-                    print (target+" "+ip)
+                    exists[target]=ip
+                    # print (target+" "+ip)
             except Exception as e:
                 c=1 #eat up
     if outputfile is not '':
+        f.write(json.dumps(exists))
         f.close()
     return exists
 
 def print_header():
-    print ('')
     print ('  _______ _      _____     _____  _____          _   _ _   _ ______ _____  ')
     print (' |__   __| |    |  __ \   / ____|/ ____|   /\   | \ | | \ | |  ____|  __ \ ')
     print ('    | |  | |    | |  | | | (___ | |       /  \  |  \| |  \| | |__  | |__) |')
     print ('    | |  | |    | |  | |  \___ \| |      / /\ \ | . ` | . ` |  __| |  _  / ')
     print ('    | |  | |____| |__| |  ____) | |____ / ____ \| |\  | |\  | |____| | \ \ ')
     print ('    |_|  |______|_____/  |_____/ \_____/_/    \_|_| \_|_| \_|______|_|  \_\\')
-    print ('')
+    print ('                                                                   by ozzi-')
 
 def main(argv):
-    global domain,https,outputfile,tldfile,mode
+    global domain,https,outputfile,tldfile,mode,iana
     c=False
     n=False
     b=False
     try:
-        opts, args = getopt.getopt(argv,"bncsd:o:i:")
+        opts, args = getopt.getopt(argv,"bncsd:o:i:f")
     except getopt.GetoptError:
-        print ('tld_scanner.py  [-d <domain>] [-o <outputfile>] [-i <tldfile>] [-n] [-c] [-b] [-s]')
+        print ('tld_scanner.py  [-d <domain>] [-o <outputfile>] [-i <tldfile>] [-n] [-c] [-b] [-s] [-f]')
         print ('')
-        print ('This tool scans for all possible TLDs of a given domain name')
+        print ('This tool scans for possible TLDs of a given domain name')
         print ('')
         print ('-d <domain>     | Specifiy the domain name, example: "google"')
-        print ('-o <outputfile> | Write results into <outputfile>')
+        print ('-o <outputfile> | Write results into <outputfile> as json')
         print ('-i <tldfile>    | Use your own custom TLD list')
         print ('                  One TLD per line, no other seperators, case insensitive')
-        print ('-n              | Does a namelookup and prints the ip (fastest)')
+        print ('-f              | Use the newest and complete list of TLDs from IANA')
+        print ('                  This will take quite some time')
+        print ('-n              | Does a name lookup and prints the ip (fastest)')
         print ('-c              | Tries to connect to the host directly')
         print ('-b              | Default: Does a namelookup and then tries to connect')
         print ('                  prints the ip')
-        print ('-s              | Check for https:// too')
+        print ('-s              | Check for https too')
 
         sys.exit(2)
     for opt, arg in opts:
@@ -80,6 +85,8 @@ def main(argv):
             c=True
         elif opt in ("-n"):
             n=True
+        elif opt in ("-f"):
+            iana=True
     mode = 'b' # DEFAULT
     if b or (n and c):
             mode = 'b'
@@ -91,16 +98,22 @@ def main(argv):
 if __name__ == '__main__':
     main(sys.argv[1:])
     print_header()
-    try:
-        print("Getting the newest TLD's from iana.org . . .")
-        f = urllib2.urlopen("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
-        data = f.read()
-        with open("tld_scanner_list.txt", "wb") as code:
-            code.write(data)
-    except Exception as e:
-        print(e)
-        print("Please check your network connectivity (or https://data.iana.org is down)!")
-        sys.exit(2)
+    surpressCTldMsg = False
+    if iana:
+        try:
+            print("Getting the newest TLD's from iana.org . . .")
+            f = urllib2.urlopen("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
+            data = f.read()
+            with open("tld_scanner_list.txt", "wb") as list:
+                list.write(data)
+        except Exception as e:
+            print(e)
+            print("Please check your network connectivity (or https://data.iana.org is down)!")
+            sys.exit(2)
+    if iana is False and tldfile is '':
+        tldfile = "ccTLDs.txt"
+        print("Using country code TLDs")
+        surpressCTldMsg = True
     try:
         if tldfile is not '':
             try:
@@ -108,7 +121,8 @@ if __name__ == '__main__':
             except Exception as e:
                 print ("Inputfile doesn't exist / not readable")
                 sys.exit(2)
-            print("Using custom TLD List: "+str(tlds))
+            if surpressCTldMsg is False:
+                print("Using custom TLD List: "+str(tlds))
         else:
             tlds = [line.rstrip('\n') for line in open("tld_scanner_list.txt")]
             print(tlds.pop(0))
@@ -118,15 +132,19 @@ if __name__ == '__main__':
         if mode =='n': print("Mode: Name lookup only")
         protocols = ["http://","https://"] if https else ["http://"]
         print("Using the following protocol(s): "+str(protocols))
+        print domain
         if domain is '':
             print("")
-            domain = input("Enter Domain name (example 'google'): ")
+            domain = raw_input("Enter Domain name (example 'google'): ")
         else:
             print('\nUsing domain: '+domain)
         domain = domain+"."
         print("")
         start_time = time.time()
-        exists= scan(tlds,domain,protocols)
+        exists = scan(tlds,domain,protocols)
+        print ("")
+        print exists
         print("\n--- %s seconds ---" % (time.time() - start_time))
-    except:
+    except Exception as e:
+        print(e)
         print ('CTRL-C or exception')
