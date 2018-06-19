@@ -6,7 +6,7 @@ TLD Scanner scans for all existing top level domains for a give domain name.
 | --- | --- |
 | -d \<domain\>  | Specifiy the domain name, example: "google" |
 | -o \<outputfile\> | Write results into \<outputfile\> as json |
-| -i \<tldfile\> | Use your own custom TLD list - One TLD per line, no other seperators, case insensitive |
+| -i \<tldfile\> | Use your own custom TLD list - One TLD per line, no other seperators, case insensitive. You can find three TLD files ccTLDs.txt (country code), sTLDs.txt (special TLDs), topTLDs.txt (top 24 TLDs) |
 | -f | Use the newest and complete list of TLDs from IANA. This will take quite some time |
 | -n | Does a name lookup and prints the ip (fastest) |
 | -c | Tries to connect to the host directly |
