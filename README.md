@@ -15,6 +15,11 @@ TLD Scanner scans for all existing top level domains for a give domain name.
 
 
 ## Example 
+
+Recorded usage searching for google in the provided topTLD list:
+https://asciinema.org/a/J8kQCOFlnbUy2aR0RC6uXPVLa
+
+
 This will do a name lookup (fastest method) for google using the top TLD list (24 domains in 0.0649 seconds)
 ```
 $ ./tld_scanner.py -n -d google -i topTLDs.txt 
@@ -40,7 +45,7 @@ Using domain: google
 --- 0.064945936203 seconds ---
 ```
 
-This will check all ~1500 TLDs for the domain name gnu using http and https
+This will check all ~1500 TLDs for the domain name "gnu" using http and https
 ```
 ./tld_scanner.py -f -d gnu -s
 ```
