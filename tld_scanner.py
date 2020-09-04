@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 import json
-import urllib2
+import urllib.request, urllib.error
 import sys, getopt, socket
 from tqdm import tqdm
 
@@ -26,7 +26,7 @@ def scan(tlds,domain,protocols):
                 if ip != "127.0.53.53":
                     target=(protocol+domain+tld.lower())
                     if mode != 'n':
-                        response = urllib2.urlopen(target)
+                        response = urllib.request.urlopen(target)
                     exists[target]=ip
                     # print (target+" "+ip)
             except Exception as e:
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     if iana:
         try:
             print("Getting the newest TLD's from iana.org . . .")
-            f = urllib2.urlopen("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
+            f = urllib.request.urlopen("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
             data = f.read()
             with open("tld_scanner_list.txt", "wb") as list:
                 list.write(data)
@@ -122,29 +122,29 @@ if __name__ == '__main__':
                 print ("Inputfile doesn't exist / not readable")
                 sys.exit(2)
             if surpressCTldMsg is False:
-                print("Using custom TLD List: "+str(tlds))
+                print(("Using custom TLD List: "+str(tlds)))
         else:
             tlds = [line.rstrip('\n') for line in open("tld_scanner_list.txt")]
-            print(tlds.pop(0))
+            print((tlds.pop(0)))
         print("")
         if mode =='c': print("Mode: Connecting to host")
         if mode =='b': print("Mode: Name lookup + connecting to host")
         if mode =='n': print("Mode: Name lookup only")
         protocols = ["http://","https://"] if https else ["http://"]
-        print("Using the following protocol(s): "+str(protocols))
-        print domain
+        print(("Using the following protocol(s): "+str(protocols)))
+        print(domain)
         if domain is '':
             print("")
-            domain = raw_input("Enter Domain name (example 'google'): ")
+            domain = input("Enter Domain name (example 'google'): ")
         else:
-            print('\nUsing domain: '+domain)
+            print(('\nUsing domain: '+domain))
         domain = domain+"."
         print("")
         start_time = time.time()
         exists = scan(tlds,domain,protocols)
         print ("")
-        print exists
-        print("\n--- %s seconds ---" % (time.time() - start_time))
+        print (exists)
+        print(("\n--- %s seconds ---" % (time.time() - start_time)))
     except Exception as e:
         print(e)
         print ('CTRL-C or exception')
