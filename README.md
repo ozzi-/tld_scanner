@@ -14,6 +14,15 @@ TLD Scanner scans for all existing top level domains for a give domain name.
 | -s | Check for https too |
 
 
+## Get TLD Scanner running
+```
+git clone https://github.com/ozzi-/tld_scanner.git
+cd tld_scanner
+pip3 install -r requirements.txt
+python3 tld_scanner.py
+```
+
+
 ## Example 
 
 This will do a name lookup (fastest method) for google using the top TLD list (24 domains in 0.0649 seconds)
