@@ -11,6 +11,7 @@ https  = False
 outputfile = ''
 tldfile = ''
 mode = ''
+omode = 'json'
 iana = False
 
 def scan(tlds,domain,protocols):
@@ -32,8 +33,15 @@ def scan(tlds,domain,protocols):
             except Exception as e:
                 c=1 #eat up
     if outputfile is not '':
-        f.write(json.dumps(exists))
+        if omode == "plain":
+            for key,value in exists.items():
+                f.write('{0}\n'.format(key))
+        elif omode == "json":
+            f.write(json.dumps(exists))
+        elif omode == "jsonarray":
+            f.write(json.dumps(list(exists)))
         f.close()
+        print('Wrote results to \''+outputfile+'\' as '+omode)
     return exists
 
 def print_header():
@@ -46,28 +54,32 @@ def print_header():
     print ('                                                                   by ozzi-')
 
 def main(argv):
-    global domain,https,outputfile,tldfile,mode,iana
+    global domain,https,outputfile,tldfile,mode,iana,omode
     c=False
     n=False
     b=False
     try:
-        opts, args = getopt.getopt(argv,"bncsd:o:i:f")
+        opts, args = getopt.getopt(argv,"bncsd:o:i:f:m:")
     except getopt.GetoptError:
-        print ('tld_scanner.py  [-d <domain>] [-o <outputfile>] [-i <tldfile>] [-n] [-c] [-b] [-s] [-f]')
+        print ('tld_scanner.py  [-d <domain>] [-o <outputfile>] [-m <outputmode>] [-i <tldfile>] [-n] [-c] [-b] [-s] [-f]')
         print ('')
-        print ('This tool scans for possible TLDs of a given domain name')
+        print ('Scan for possible TLDs of a given domain name')
         print ('')
-        print ('-d <domain>     | Specifiy the domain name, example: "google"')
-        print ('-o <outputfile> | Write results into <outputfile> as json')
-        print ('-i <tldfile>    | Use your own custom TLD list')
-        print ('                  One TLD per line, no other seperators, case insensitive')
-        print ('-f              | Use the newest and complete list of TLDs from IANA')
-        print ('                  This will take quite some time')
-        print ('-n              | Does a name lookup and prints the ip (fastest)')
-        print ('-c              | Tries to connect to the host directly')
-        print ('-b              | Default: Does a namelookup and then tries to connect')
-        print ('                  prints the ip')
-        print ('-s              | Check for https too')
+        print ('-d <domain>       | Specifiy the domain name, example: "google"')
+        print ('-o <outputfile>   | Write results into <outputfile>')
+        print ('-i <tldfile>      | Use your own custom TLD list')
+        print ('                    One TLD per line, no other seperators, case insensitive')
+        print ('-m <outputmode>   | Sets the output mode, defaults to \'json\'')
+        print ('                    json      - json objects, key = url and value = ip')
+        print ('                    jsonarray - json array, entries = urls')
+        print ('                    plain     - plain text, one url per line')
+        print ('-f                | Use the newest and complete list of TLDs from IANA')
+        print ('                    This will take quite some time')
+        print ('-n                | Does a name lookup and prints the ip (fastest)')
+        print ('-c                | Tries to connect to the host directly')
+        print ('-b                | Default: Does a namelookup and then tries to connect')
+        print ('                    prints the IP')
+        print ('-s                | Check for HTTPS too')
 
         sys.exit(2)
     for opt, arg in opts:
@@ -79,6 +91,8 @@ def main(argv):
             domain = arg
         elif opt in ("-i"):
             tldfile = arg
+        elif opt in ("-m"):
+            omode = arg.lower()
         elif opt in ("-b"):
             b=True
         elif opt in ("-c"):
@@ -94,7 +108,8 @@ def main(argv):
             mode = 'n'
     elif c:
         mode = 'c'
-
+    if omode != 'json' and omode != 'jsonarray' and omode != 'plain':
+        omode = 'json'
 if __name__ == '__main__':
     main(sys.argv[1:])
     print_header()
