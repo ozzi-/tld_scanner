@@ -5,8 +5,12 @@ TLD Scanner scans for all existing top level domains for a give domain name.
 | Switch | Description |
 | --- | --- |
 | -d \<domain\>  | Specifiy the domain name, example: "google" |
-| -o \<outputfile\> | Write results into \<outputfile\> as json |
+| -o \<outputfile\> | Write results into \<outputfile\> |
 | -i \<tldfile\> | Use your own custom TLD list - One TLD per line, no other seperators, case insensitive. You can find three TLD files ccTLDs.txt (country code), sTLDs.txt (special TLDs), topTLDs.txt (top 24 TLDs) |
+| -m \<outputmode\> | Sets the output mode, defaults to 'json' |
+| | json -> returns a json object where the keys contain the urls and the values the IP address |
+| | jsonarray -> returns a json array where all entries are the URLs |
+| | plain -> returns a plain text list of the URLs seperated by a new line |
 | -f | Use the newest and complete list of TLDs from IANA. This will take quite some time |
 | -n | Does a name lookup and prints the ip (fastest) |
 | -c | Tries to connect to the host directly |
