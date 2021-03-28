@@ -56,5 +56,5 @@ Using domain: google
 
 This will check all ~1500 TLDs for the domain name "gnu" using http and https
 ```
-./tld_scanner.py -f -d gnu -s
+./tld_scanner.py -d gnu -f -s
 ```
