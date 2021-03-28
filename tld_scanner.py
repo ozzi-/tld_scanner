@@ -42,6 +42,14 @@ def scan(tlds,domain,protocols):
             f.write(json.dumps(list(exists)))
         f.close()
         print('Wrote results to \''+outputfile+'\' as '+omode)
+    print ('')
+    if omode == "plain":
+        for key,value in exists.items():
+            print('{0}'.format(key))
+    elif omode == "json":
+        print(json.dumps(exists))
+    elif omode == "jsonarray":
+        print(json.dumps(list(exists)))
     return exists
 
 def print_header():
@@ -156,9 +164,7 @@ if __name__ == '__main__':
         domain = domain+"."
         print("")
         start_time = time.time()
-        exists = scan(tlds,domain,protocols)
-        print ("")
-        print (exists)
+        scan(tlds,domain,protocols)
         print(("\n--- %s seconds ---" % (time.time() - start_time)))
     except Exception as e:
         print(e)
