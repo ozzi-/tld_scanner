@@ -67,7 +67,7 @@ def main(argv):
     n=False
     b=False
     try:
-        opts, args = getopt.getopt(argv,"bncsd:o:i:f:m:")
+        opts, args = getopt.getopt(argv,"fbncsd:o:i:m:")
     except getopt.GetoptError:
         print ('tld_scanner.py  [-d <domain>] [-o <outputfile>] [-m <outputmode>] [-i <tldfile>] [-n] [-c] [-b] [-s] [-f]')
         print ('')
