@@ -15,7 +15,7 @@ omode = 'json'
 iana = False
 
 def scan(tlds,domain,protocols):
-    if outputfile is not '':
+    if outputfile != '':
         f = open(outputfile,'w')
     exists = {}
     for tld in tqdm(tlds, unit="domains"):
@@ -32,7 +32,7 @@ def scan(tlds,domain,protocols):
                     # print (target+" "+ip)
             except Exception as e:
                 c=1 #eat up
-    if outputfile is not '':
+    if outputfile != '':
         if omode == "plain":
             for key,value in exists.items():
                 f.write('{0}\n'.format(key))
@@ -133,12 +133,12 @@ if __name__ == '__main__':
             print(e)
             print("Please check your network connectivity (or https://data.iana.org is down)!")
             sys.exit(2)
-    if iana is False and tldfile is '':
+    if iana == False and tldfile == '':
         tldfile = "ccTLDs.txt"
         print("Using country code TLDs")
         surpressCTldMsg = True
     try:
-        if tldfile is not '':
+        if tldfile != '':
             try:
                 tlds = [line.rstrip('\n') for line in open(tldfile)]
             except Exception as e:
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         protocols = ["http://","https://"] if https else ["http://"]
         print(("Using the following protocol(s): "+str(protocols)))
         print(domain)
-        if domain is '':
+        if domain == '':
             print("")
             domain = input("Enter Domain name (example 'google'): ")
         else:
